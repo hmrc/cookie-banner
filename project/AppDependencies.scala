@@ -4,6 +4,7 @@ object AppDependencies {
 
   lazy val test: Seq[ModuleID] = Seq(
     "org.scalatest"        %% "scalatest"                % "3.1.0"        % Test,
+    "com.vladsch.flexmark" % "flexmark-all"              % "0.35.10"      % Test,
     "ch.qos.logback"       % "logback-classic"           % "1.2.3"        % Test,
   )
 
