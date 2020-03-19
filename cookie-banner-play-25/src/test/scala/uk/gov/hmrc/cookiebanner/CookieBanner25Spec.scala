@@ -16,14 +16,80 @@
 
 package uk.gov.hmrc.cookiebanner
 
+import akka.actor.ActorSystem
+import com.typesafe.config.Config
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Configuration}
+import play.api.libs.ws.WSClient
+import play.api.mvc.RequestHeader
+import play.api.test.FakeRequest
+import play.twirl.api.Html
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.hooks.HttpHook
+import uk.gov.hmrc.play.http.ws.WSHttp
 
-class CookieBanner25Spec extends AnyFreeSpec with Matchers {
+class CookieBanner25Spec extends AnyFreeSpec with Matchers
+  with WireMockEndpoints with GuiceOneAppPerSuite {
+
+  private val ws = app.injector.instanceOf[WSClient]
+  private val actorSystem = app.injector.instanceOf[ActorSystem]
+
+  override def fakeApplication(): Application =
+    new GuiceApplicationBuilder().configure(Map("cookie-banner.url" -> s"http://$wireMockHost:$wireMockPort/tracking-consent")).build()
+
+  private val config = Configuration("cookie-banner.url" -> s"http://$wireMockHost:$wireMockPort/tracking-consent")
+
+  private def cookieBanner(config: Configuration) = {
+    implicit val fakeRequest: RequestHeader = FakeRequest()
+    // create a new CookieBanner for each test, to avoid caching
+    new CookieBanner(new DefaultHttpClient(config, ws, actorSystem), config).cookieBanner
+  }
 
   "CookieBanner" - {
-    "1 shouldBe 1" in {
-      1 shouldBe 1
+    "should retrieve partial" in {
+      partialEndpoint("/tracking-consent",
+        willRespondWith = (
+          200,
+          Some("<p>Some partial content</p>")))
+
+      cookieBanner(config) shouldBe Html("<p>Some partial content</p>")
+    }
+
+    "should return empty Html on error from cookie-banner-url" in {
+      partialEndpoint("/tracking-consent",
+        willRespondWith = (
+          404,
+          None))
+
+      cookieBanner(config) shouldBe Html("")
+    }
+
+    "should return empty Html if configuration is not set" in {
+      cookieBanner(Configuration.empty) shouldBe Html("")
     }
   }
+
+  "CookieBannerStatic" - {
+    "should provide a non-DI version" in {
+      partialEndpoint("/tracking-consent",
+        willRespondWith = (
+          200,
+          Some("<p>Some partial content</p>")))
+
+      implicit val fakeRequest: RequestHeader = FakeRequest()
+      CookieBannerStatic.cookieBanner shouldBe Html("<p>Some partial content</p>")
+    }
+  }
+}
+
+// this snippet is taken from play-bootstrap. we don't want a dependency on play-bootstrap in this library though
+trait HttpClient extends HttpGet with HttpPut with HttpPost with HttpDelete with HttpPatch
+class DefaultHttpClient(config: Configuration,
+                        override val wsClient: WSClient,
+                        override protected val actorSystem: ActorSystem) extends HttpClient with WSHttp {
+  override lazy val configuration: Option[Config] = Option(config.underlying)
+  override val hooks: Seq[HttpHook] = Seq()
 }
