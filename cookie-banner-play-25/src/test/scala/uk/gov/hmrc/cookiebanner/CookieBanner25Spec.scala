@@ -34,13 +34,19 @@ import uk.gov.hmrc.play.http.ws.WSHttp
 class CookieBanner25Spec extends AnyFreeSpec with Matchers
   with WireMockEndpoints with GuiceOneAppPerSuite {
 
+  val config = Configuration(
+    "cookie-banner.host" -> wireMockHost,
+    "cookie-banner.port" -> wireMockPort.toString,
+    "cookie-banner.path" -> "/tracking-consent",
+    "cookie-banner.protocol" -> "http"
+  )
+
+  override def fakeApplication(): Application = {
+    new GuiceApplicationBuilder().configure(config).build()
+  }
+
   private val ws = app.injector.instanceOf[WSClient]
   private val actorSystem = app.injector.instanceOf[ActorSystem]
-
-  override def fakeApplication(): Application =
-    new GuiceApplicationBuilder().configure(Map("cookie-banner.url" -> s"http://$wireMockHost:$wireMockPort/tracking-consent")).build()
-
-  private val config = Configuration("cookie-banner.url" -> s"http://$wireMockHost:$wireMockPort/tracking-consent")
 
   private def cookieBanner(config: Configuration) = {
     implicit val fakeRequest: RequestHeader = FakeRequest()

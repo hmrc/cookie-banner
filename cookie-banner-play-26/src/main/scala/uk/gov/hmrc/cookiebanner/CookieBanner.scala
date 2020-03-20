@@ -26,24 +26,22 @@ import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 import scala.concurrent.duration.Duration
 
 class CookieBanner @Inject() (http: CoreGet, config: Configuration) extends CachedStaticHtmlPartialRetriever {
+
+  private val cookieBannerConfig = new CookieBannerConfig(config)
+
   override def httpGet: CoreGet = http
-  private val partialUrl: Option[String] = config.getOptional[String]("cookie-banner.url")
 
-  override def refreshAfter: Duration = {
-    config.getOptional[Duration]("cookie-banner.refreshAfter")
-      .getOrElse(super.refreshAfter)
-  }
+  override def refreshAfter: Duration =
+    cookieBannerConfig.cacheRefreshAfter.getOrElse(super.refreshAfter)
 
-  override def expireAfter: Duration = {
-    config.getOptional[Duration]("cookie-banner.expireAfter")
-      .getOrElse(super.expireAfter)
-  }
+  override def expireAfter: Duration =
+    cookieBannerConfig.cacheExpireAfter.getOrElse(super.expireAfter)
 
   def cookieBanner(implicit req: RequestHeader): Html =
-    partialUrl
+    cookieBannerConfig.partialUrl
       .map(loadPartial(_).successfulContentOrEmpty)
       .getOrElse {
-        Logger.logger.warn("cookie-banner.url is not configured")
+        Logger.logger.warn("cookie-banner is not configured")
         Html("")
       }
 }

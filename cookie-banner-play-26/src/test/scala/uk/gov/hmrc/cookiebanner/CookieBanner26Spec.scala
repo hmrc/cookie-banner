@@ -36,7 +36,12 @@ class CookieBanner26Spec extends AnyFreeSpec with Matchers
   private val ws = app.injector.instanceOf[WSClient]
   private val actorSystem = app.injector.instanceOf[ActorSystem]
 
-  private val config = Configuration("cookie-banner.url" -> s"http://$wireMockHost:$wireMockPort/tracking-consent")
+  private val config = Configuration(
+    "cookie-banner.host" -> wireMockHost,
+    "cookie-banner.port" -> wireMockPort,
+    "cookie-banner.path" -> "/tracking-consent",
+    "cookie-banner.protocol" -> "http"
+  )
 
   private def cookieBanner(config: Configuration) = {
     implicit val fakeRequest: RequestHeader = FakeRequest()
