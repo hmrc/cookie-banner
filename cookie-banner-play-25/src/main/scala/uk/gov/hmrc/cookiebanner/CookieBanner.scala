@@ -27,37 +27,44 @@ import uk.gov.hmrc.http.{CoreGet, HttpGet}
 import uk.gov.hmrc.play.http.ws.WSGet
 import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 
-case class CookieConfig(protocol: String, host: String, port: Int, path: String)
+import scala.concurrent.duration._
 
-class CookieBanner @Inject() (http: WSGet, config: Configuration) extends CachedStaticHtmlPartialRetriever {
+class CookieBanner @Inject() (http: CoreGet, config: Configuration) extends CachedStaticHtmlPartialRetriever {
+
+  private val cookieBannerConfig = new CookieBannerConfig(config)
+
   override def httpGet: CoreGet = http
-  private val partialUrl: Option[String] = config.getString("cookie-banner-url")
+
+  override def refreshAfter: Duration =
+    cookieBannerConfig.cacheRefreshAfter.getOrElse(super.refreshAfter)
+
+  override def expireAfter: Duration =
+    cookieBannerConfig.cacheExpireAfter.getOrElse(super.expireAfter)
 
   def cookieBanner(implicit req: RequestHeader): Html =
-    partialUrl
+    cookieBannerConfig.partialUrl
       .map(loadPartial(_).successfulContentOrEmpty)
       .getOrElse {
-        Logger.logger.warn("cookie-banner-url is not configured")
+        Logger.logger.warn("cookie-banner is not configured")
         Html("")
       }
 }
 
-object WSHttp extends HttpGet with WSGet {
-  override protected def actorSystem: ActorSystem = Play.current.actorSystem
-  override protected def configuration: Option[Config] = Some(Play.current.configuration.underlying)
-  override val hooks: Seq[HttpHook] = NoneRequired
-}
+/**
+ * Utility object to allow Play2.5 services that do not yet use dependency-injection
+ * to use the CookieBanner library with minimal effort.
+ *
+ * It is preferable to use the `CookieBanner` class, and inject it into
+ * a template, rather than this static method.
+ */
+object CookieBannerStatic {
 
-object CookieBannerStatic extends CachedStaticHtmlPartialRetriever {
-  private val config = Play.current.configuration
-  override def httpGet: CoreGet = WSHttp
-  private val partialUrl = config.getString("cookie-banner-url")
+  private object WSHttp extends HttpGet with WSGet {
+    override protected def actorSystem: ActorSystem = Play.current.actorSystem
+    override protected def configuration: Option[Config] = Some(Play.current.configuration.underlying)
+    override val hooks: Seq[HttpHook] = NoneRequired
+  }
+  private val instance = new CookieBanner(WSHttp, Play.current.configuration)
 
-  def cookieBanner(implicit req: RequestHeader): Html =
-    partialUrl
-      .map(loadPartial(_).successfulContentOrEmpty)
-      .getOrElse {
-        Logger.logger.warn("cookie-banner-url is not configured")
-        Html("")
-      }
+  def cookieBanner(implicit req: RequestHeader): Html = instance.cookieBanner
 }

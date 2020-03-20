@@ -32,8 +32,17 @@ lazy val library = Project(name, file("."))
     crossScalaVersions := Seq.empty
   )
   .aggregate(
+    cookieBannerCommon,
     cookieBannerPlay25,
     cookieBannerPlay26
+  )
+
+lazy val cookieBannerCommon = Project("cookie-banner-common", file("cookie-banner-common"))
+  .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
+  .settings(
+    commonSettings,
+    crossScalaVersions := Seq(scala2_11),
+    libraryDependencies ++= AppDependencies.cookieBannerCommon
   )
 
 lazy val cookieBannerPlay25 = Project("cookie-banner-play-25", file("cookie-banner-play-25"))
@@ -42,11 +51,11 @@ lazy val cookieBannerPlay25 = Project("cookie-banner-play-25", file("cookie-bann
     commonSettings,
     crossScalaVersions := Seq(scala2_11),
     libraryDependencies ++= AppDependencies.cookieBannerPlay25
-  )
+  ).dependsOn(cookieBannerCommon % "test->test;compile->compile")
 
 lazy val cookieBannerPlay26 = Project("cookie-banner-play-26", file("cookie-banner-play-26"))
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
     libraryDependencies ++= AppDependencies.cookieBannerPlay26
-  )
+  ).dependsOn(cookieBannerCommon % "test->test;compile->compile")
