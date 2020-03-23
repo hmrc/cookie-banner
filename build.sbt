@@ -14,8 +14,8 @@ lazy val commonResolvers = Seq(
 lazy val commonSettings = Seq(
   organization := "uk.gov.hmrc",
   majorVersion := 0,
-  scalaVersion := scala2_11,
-  crossScalaVersions := Seq(scala2_11), // todo - update to include scala2_12, when play-partials is on 2.12 too.
+  scalaVersion := scala2_12,
+  crossScalaVersions := Seq(scala2_11, scala2_12),
   makePublicallyAvailableOnBintray := true,
   resolvers := commonResolvers
 )
@@ -41,7 +41,6 @@ lazy val cookieBannerCommon = Project("cookie-banner-common", file("cookie-banne
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
-    crossScalaVersions := Seq(scala2_11),
     libraryDependencies ++= AppDependencies.cookieBannerCommon
   )
 
@@ -49,6 +48,7 @@ lazy val cookieBannerPlay25 = Project("cookie-banner-play-25", file("cookie-bann
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
+    scalaVersion := scala2_11,
     crossScalaVersions := Seq(scala2_11),
     libraryDependencies ++= AppDependencies.cookieBannerPlay25
   ).dependsOn(cookieBannerCommon % "test->test;compile->compile")
