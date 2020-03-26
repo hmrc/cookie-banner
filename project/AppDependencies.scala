@@ -9,8 +9,6 @@ object AppDependencies {
     "com.github.tomakehurst" %  "wiremock"           % "1.58"     % Test,
   )
 
-  lazy val cookieBannerCommon: Seq[ModuleID] = testCommon
-
   // https://github.com/playframework/scalatestplus-play#releases
   lazy val cookieBannerPlay25: Seq[ModuleID] = Seq(
     "uk.gov.hmrc" %% "play-partials" % "6.9.0-play-25",

@@ -20,18 +20,19 @@ import play.api.Configuration
 
 import scala.concurrent.duration._
 
-class CookieBannerConfig(configuration: Configuration) {
-  def partialUrl: Option[String] = {
-    val hostOpt: Option[String] = configuration.getOptional[String]("cookie-banner.host")
-    val pathOpt: Option[String] = configuration.getOptional[String]("cookie-banner.path")
+import play.api.CookieBannerConfigHelper._
 
+class CookieBannerConfig(configuration: Configuration) {
+
+  def partialUrl: Option[String] = {
     val protocol = configuration.getOptional[String]("cookie-banner.protocol").getOrElse("https")
     val port     = configuration.getOptional[Int]("cookie-banner.port").getOrElse(443)
 
-    (hostOpt, pathOpt) match {
-      case (Some(host), Some(path)) =>
-        Some(s"$protocol://$host:$port$path")
-      case _ => None
+    for {
+      host <- configuration.getOptional[String] ("cookie-banner.host")
+      path <- configuration.getOptional[String]("cookie-banner.path")
+    } yield {
+      s"$protocol://$host:$port$path"
     }
   }
 

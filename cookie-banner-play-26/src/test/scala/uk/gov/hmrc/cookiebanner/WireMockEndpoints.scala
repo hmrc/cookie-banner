@@ -19,8 +19,8 @@ package uk.gov.hmrc.cookiebanner
 import java.net.ServerSocket
 
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.{MappingBuilder, ResponseDefinitionBuilder, WireMock}
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.client.{MappingBuilder, ResponseDefinitionBuilder, WireMock}
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}

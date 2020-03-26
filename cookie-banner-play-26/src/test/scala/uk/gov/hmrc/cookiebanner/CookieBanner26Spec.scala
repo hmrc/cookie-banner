@@ -21,13 +21,13 @@ import com.typesafe.config.Config
 import org.scalatest.freespec.AnyFreeSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.Configuration
 import play.api.libs.ws.WSClient
 import play.api.mvc.RequestHeader
 import play.api.test.FakeRequest
+import play.api.Configuration
 import play.twirl.api.Html
-import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.play.http.ws.WSHttp
 
 class CookieBanner26Spec extends AnyFreeSpec with Matchers

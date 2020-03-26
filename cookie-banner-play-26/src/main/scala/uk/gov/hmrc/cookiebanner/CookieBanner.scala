@@ -17,8 +17,8 @@
 package uk.gov.hmrc.cookiebanner
 
 import javax.inject.Inject
-import play.api.{Configuration, Logger}
 import play.api.mvc.RequestHeader
+import play.api.{Configuration, Logger}
 import play.twirl.api.Html
 import uk.gov.hmrc.http.CoreGet
 import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
