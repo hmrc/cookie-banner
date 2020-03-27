@@ -54,30 +54,6 @@ class CookieBanner25Spec extends AnyFreeSpec with Matchers
     new CookieBanner(new DefaultHttpClient(config, ws, actorSystem), config).cookieBanner
   }
 
-  "CookieBanner" - {
-    "should retrieve partial" in {
-      partialEndpoint("/tracking-consent",
-        willRespondWith = (
-          200,
-          Some("<p>Some partial content</p>")))
-
-      cookieBanner(config) shouldBe Html("<p>Some partial content</p>")
-    }
-
-    "should return empty Html on error from cookie-banner-url" in {
-      partialEndpoint("/tracking-consent",
-        willRespondWith = (
-          404,
-          None))
-
-      cookieBanner(config) shouldBe Html("")
-    }
-
-    "should return empty Html if configuration is not set" in {
-      cookieBanner(Configuration.empty) shouldBe Html("")
-    }
-  }
-
   "CookieBannerStatic" - {
     "should provide a non-DI version" in {
       partialEndpoint("/tracking-consent",

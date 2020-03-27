@@ -17,7 +17,7 @@
 package uk.gov.hmrc.cookiebanner
 
 import javax.inject.Inject
-import play.api.{Configuration, Logger}
+import play.api.Logger
 import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 import uk.gov.hmrc.http.CoreGet
@@ -25,20 +25,18 @@ import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
 
 import scala.concurrent.duration.Duration
 
-class CookieBanner @Inject() (http: CoreGet, config: Configuration) extends CachedStaticHtmlPartialRetriever {
-
-  private val cookieBannerConfig = new CookieBannerConfig(config)
+class CookieBanner @Inject() (http: CoreGet, config: CommonConfig) extends CachedStaticHtmlPartialRetriever {
 
   override def httpGet: CoreGet = http
 
   override def refreshAfter: Duration =
-    cookieBannerConfig.cacheRefreshAfter.getOrElse(super.refreshAfter)
+    config.cacheRefreshAfter.getOrElse(super.refreshAfter)
 
   override def expireAfter: Duration =
-    cookieBannerConfig.cacheExpireAfter.getOrElse(super.expireAfter)
+    config.cacheExpireAfter.getOrElse(super.expireAfter)
 
   def cookieBanner(implicit req: RequestHeader): Html =
-    cookieBannerConfig.partialUrl
+    config.partialUrl
       .map(loadPartial(_).successfulContentOrEmpty)
       .getOrElse {
         Logger.logger.warn("cookie-banner is not configured")

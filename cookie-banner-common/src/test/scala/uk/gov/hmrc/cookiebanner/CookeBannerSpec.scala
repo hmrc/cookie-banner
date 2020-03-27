@@ -30,23 +30,24 @@ import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.http.ws.WSHttp
 
-class CookieBanner26Spec extends AnyFreeSpec with Matchers
+import scala.concurrent.duration.Duration
+
+class CookieBannerSpec extends AnyFreeSpec with Matchers
   with WireMockEndpoints with GuiceOneAppPerSuite {
 
   private val ws = app.injector.instanceOf[WSClient]
   private val actorSystem = app.injector.instanceOf[ActorSystem]
 
-  private val config = Configuration(
-    "cookie-banner.host" -> wireMockHost,
-    "cookie-banner.port" -> wireMockPort,
-    "cookie-banner.path" -> "/tracking-consent",
-    "cookie-banner.protocol" -> "http"
-  )
+  val config = new CommonConfig {
+    override def partialUrl: Option[String] = Some(s"http://$wireMockHost:$wireMockPort/tracking-consent")
+    override def cacheRefreshAfter: Option[Duration] = None
+    override def cacheExpireAfter: Option[Duration] = None
+  }
 
-  private def cookieBanner(config: Configuration) = {
+  private def cookieBanner(config: CommonConfig) = {
     implicit val fakeRequest: RequestHeader = FakeRequest()
     // create a new CookieBanner for each test, to avoid caching
-    new CookieBanner(new DefaultHttpClient(config, ws, actorSystem), config).cookieBanner
+    new CookieBanner(new DefaultHttpClient(Configuration.empty, ws, actorSystem), config).cookieBanner
   }
 
   "CookieBanner" - {
@@ -69,7 +70,12 @@ class CookieBanner26Spec extends AnyFreeSpec with Matchers
     }
 
     "should return empty Html if configuration is not set" in {
-      cookieBanner(Configuration.empty) shouldBe Html("")
+      val config = new CommonConfig {
+        override def partialUrl: Option[String] = None
+        override def cacheRefreshAfter: Option[Duration] = None
+        override def cacheExpireAfter: Option[Duration] = None
+      }
+      cookieBanner(config) shouldBe Html("")
     }
   }
 }

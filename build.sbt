@@ -15,7 +15,7 @@ lazy val commonSettings = Seq(
   organization := "uk.gov.hmrc",
   majorVersion := 0,
   scalaVersion := scala2_12,
-  crossScalaVersions := Seq(scala2_11, scala2_12),
+  crossScalaVersions := Seq.empty,
   makePublicallyAvailableOnBintray := true,
   resolvers := commonResolvers
 )
@@ -26,10 +26,6 @@ lazy val library = Project(name, file("."))
     commonSettings,
     publish := {},
     publishAndDistribute := {},
-
-    // by default this is Seq(scalaVersion) which doesn't play well and causes sbt
-    // to try to an invalid cross-build
-    crossScalaVersions := Seq.empty
   )
   .aggregate(
     cookieBannerCommon,
@@ -41,6 +37,10 @@ lazy val cookieBannerCommon = Project("cookie-banner-common", file("cookie-banne
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
+    scalaVersion := scala2_12,
+    crossScalaVersions := Seq(scala2_11, scala2_12),
+    publish := {},
+    publishAndDistribute := {},
     libraryDependencies ++= AppDependencies.cookieBannerCommon
   )
 
@@ -51,11 +51,13 @@ lazy val cookieBannerPlay25 = Project("cookie-banner-play-25", file("cookie-bann
     scalaVersion := scala2_11,
     crossScalaVersions := Seq(scala2_11),
     libraryDependencies ++= AppDependencies.cookieBannerPlay25
-  ).dependsOn(cookieBannerCommon % "test->test;compile->compile")
+  ).dependsOn(cookieBannerCommon)
 
 lazy val cookieBannerPlay26 = Project("cookie-banner-play-26", file("cookie-banner-play-26"))
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
+    scalaVersion := scala2_12,
+    crossScalaVersions := Seq(scala2_11, scala2_12),
     commonSettings,
     libraryDependencies ++= AppDependencies.cookieBannerPlay26
-  ).dependsOn(cookieBannerCommon % "test->test;compile->compile")
+  ).dependsOn(cookieBannerCommon)

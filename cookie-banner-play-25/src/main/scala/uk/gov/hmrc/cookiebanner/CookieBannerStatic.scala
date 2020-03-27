@@ -18,37 +18,12 @@ package uk.gov.hmrc.cookiebanner
 
 import akka.actor.ActorSystem
 import com.typesafe.config.Config
-import javax.inject.Inject
+import play.api.Play
 import play.api.mvc.RequestHeader
-import play.api.{Configuration, Logger, Play}
 import play.twirl.api.Html
+import uk.gov.hmrc.http.HttpGet
 import uk.gov.hmrc.http.hooks.HttpHook
-import uk.gov.hmrc.http.{CoreGet, HttpGet}
 import uk.gov.hmrc.play.http.ws.WSGet
-import uk.gov.hmrc.play.partials.CachedStaticHtmlPartialRetriever
-
-import scala.concurrent.duration._
-
-class CookieBanner @Inject() (http: CoreGet, config: Configuration) extends CachedStaticHtmlPartialRetriever {
-
-  private val cookieBannerConfig = new CookieBannerConfig(config)
-
-  override def httpGet: CoreGet = http
-
-  override def refreshAfter: Duration =
-    cookieBannerConfig.cacheRefreshAfter.getOrElse(super.refreshAfter)
-
-  override def expireAfter: Duration =
-    cookieBannerConfig.cacheExpireAfter.getOrElse(super.expireAfter)
-
-  def cookieBanner(implicit req: RequestHeader): Html =
-    cookieBannerConfig.partialUrl
-      .map(loadPartial(_).successfulContentOrEmpty)
-      .getOrElse {
-        Logger.logger.warn("cookie-banner is not configured")
-        Html("")
-      }
-}
 
 /**
  * Utility object to allow Play2.5 services that do not yet use dependency-injection
@@ -64,7 +39,8 @@ object CookieBannerStatic {
     override protected def configuration: Option[Config] = Some(Play.current.configuration.underlying)
     override val hooks: Seq[HttpHook] = NoneRequired
   }
-  private val instance = new CookieBanner(WSHttp, Play.current.configuration)
+  private val config = new CookieBannerConfig(Play.current.configuration)
+  private val instance = new CookieBanner(WSHttp, config)
 
   def cookieBanner(implicit req: RequestHeader): Html = instance.cookieBanner
 }

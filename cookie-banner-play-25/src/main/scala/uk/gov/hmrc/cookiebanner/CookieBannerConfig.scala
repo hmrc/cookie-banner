@@ -16,22 +16,21 @@
 
 package uk.gov.hmrc.cookiebanner
 
+import javax.inject.Inject
 import play.api.Configuration
 
 import scala.concurrent.duration._
 
-class CookieBannerConfig(configuration: Configuration) {
+class CookieBannerConfig @Inject() (configuration: Configuration) extends CommonConfig {
   def partialUrl: Option[String] = {
-    val hostOpt: Option[String] = configuration.getString("cookie-banner.host")
-    val pathOpt: Option[String] = configuration.getString("cookie-banner.path")
-
     val protocol = configuration.getString("cookie-banner.protocol").getOrElse("https")
     val port     = configuration.getInt("cookie-banner.port").getOrElse(443)
 
-    (hostOpt, pathOpt) match {
-      case (Some(host), Some(path)) =>
-        Some(s"$protocol://$host:$port$path")
-      case _ => None
+    for {
+      host <- configuration.getString("cookie-banner.host")
+      path <- configuration.getString("cookie-banner.path")
+    } yield {
+      s"$protocol://$host:$port$path"
     }
   }
 
