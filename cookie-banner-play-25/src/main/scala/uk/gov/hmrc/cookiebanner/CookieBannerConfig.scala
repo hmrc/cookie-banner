@@ -23,20 +23,20 @@ import scala.concurrent.duration._
 class CookieBannerConfig(configuration: Configuration) {
 
   def partialUrl: Option[String] = {
-    val protocol = configuration.getOptional[String]("cookie-banner.protocol").getOrElse("https")
-    val port     = configuration.getOptional[Int]("cookie-banner.port").getOrElse(443)
+    val protocol = configuration.getString("cookie-banner.protocol").getOrElse("https")
+    val port     = configuration.getInt("cookie-banner.port").getOrElse(443)
 
     for {
-      host <- configuration.getOptional[String] ("cookie-banner.host")
-      path <- configuration.getOptional[String]("cookie-banner.path")
+      host <- configuration.getString("cookie-banner.host")
+      path <- configuration.getString("cookie-banner.path")
     } yield {
       s"$protocol://$host:$port$path"
     }
   }
 
   def cacheRefreshAfter: Option[Duration] =
-    configuration.getOptional[Duration]("cookie-banner.refreshAfter")
+    configuration.getMilliseconds("cookie-banner.refreshAfter").map(_.millis)
 
   def cacheExpireAfter: Option[Duration] =
-    configuration.getOptional[Duration]("cookie-banner.expireAfter")
+    configuration.getMilliseconds("cookie-banner.expireAfter").map(_.millis)
 }

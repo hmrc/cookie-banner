@@ -43,6 +43,7 @@ lazy val cookieBannerPlay25 = Project("cookie-banner-play-25", file("cookie-bann
     scalaVersion := scala2_11,
     crossScalaVersions := Seq(scala2_11),
     unmanagedSourceDirectories in Compile += baseDirectory.value / "../cookie-banner-play-26/src/main/scala",
+    Compile / unmanagedSources / excludeFilter := "*CookieBannerConfig*",
     libraryDependencies ++= AppDependencies.cookieBannerPlay25
   )
 
