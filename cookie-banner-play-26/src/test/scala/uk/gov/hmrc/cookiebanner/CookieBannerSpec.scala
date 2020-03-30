@@ -30,7 +30,7 @@ import uk.gov.hmrc.http.hooks.HttpHook
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.http.ws.WSHttp
 
-class CookieBanner26Spec extends AnyFreeSpec with Matchers
+class CookieBannerSpec extends AnyFreeSpec with Matchers
   with WireMockEndpoints with GuiceOneAppPerSuite {
 
   private val ws = app.injector.instanceOf[WSClient]

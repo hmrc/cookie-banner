@@ -25,7 +25,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 
-import scala.util.Try
+import scala.util.{Random, Try}
 
 trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfterEach {
 
@@ -64,7 +64,7 @@ trait WireMockEndpoints extends Suite with BeforeAndAfterAll with BeforeAndAfter
 private object PortTester {
 
   def findPort(excluded: Int*): Int =
-    (6001 to 7000).find(port => !excluded.contains(port) && isFree(port)).getOrElse(throw new Exception("No free port"))
+    Random.shuffle((6001 to 7000).toVector).find(port => !excluded.contains(port) && isFree(port)).getOrElse(throw new Exception("No free port"))
 
   private def isFree(port: Int): Boolean = {
     val triedSocket = Try {
