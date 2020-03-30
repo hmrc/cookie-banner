@@ -14,7 +14,7 @@ lazy val commonResolvers = Seq(
 lazy val commonSettings = Seq(
   organization := "uk.gov.hmrc",
   majorVersion := 0,
-  scalaVersion := scala2_12,
+  scalaVersion := scala2_11,
   crossScalaVersions := Seq(scala2_11, scala2_12),
   makePublicallyAvailableOnBintray := true,
   resolvers := commonResolvers
@@ -26,21 +26,21 @@ lazy val library = Project(name, file("."))
     commonSettings,
     publish := {},
     publishAndDistribute := {},
-
-    // by default this is Seq(scalaVersion) which doesn't play well and causes sbt
-    // to try to an invalid cross-build
     crossScalaVersions := Seq.empty
   )
   .aggregate(
     cookieBannerCommon,
     cookieBannerPlay25,
-    cookieBannerPlay26
+    cookieBannerPlay26,
+    cookieBannerPlay27
   )
 
 lazy val cookieBannerCommon = Project("cookie-banner-common", file("cookie-banner-common"))
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
+    publish := {},
+    publishAndDistribute := {},
     libraryDependencies ++= AppDependencies.cookieBannerCommon
   )
 
@@ -51,11 +51,20 @@ lazy val cookieBannerPlay25 = Project("cookie-banner-play-25", file("cookie-bann
     scalaVersion := scala2_11,
     crossScalaVersions := Seq(scala2_11),
     libraryDependencies ++= AppDependencies.cookieBannerPlay25
-  ).dependsOn(cookieBannerCommon % "test->test;compile->compile")
+  ).dependsOn(cookieBannerCommon % "test->test")
 
 lazy val cookieBannerPlay26 = Project("cookie-banner-play-26", file("cookie-banner-play-26"))
   .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
   .settings(
     commonSettings,
     libraryDependencies ++= AppDependencies.cookieBannerPlay26
-  ).dependsOn(cookieBannerCommon % "test->test;compile->compile")
+  ).dependsOn(cookieBannerCommon % "test->test")
+
+lazy val cookieBannerPlay27 = Project("cookie-banner-play-27", file("cookie-banner-play-27"))
+  .enablePlugins(SbtAutoBuildPlugin, SbtArtifactory)
+  .settings(
+    commonSettings,
+    Compile / scalaSource := (cookieBannerPlay26 / Compile / scalaSource).value,
+    Test    / scalaSource := (cookieBannerPlay26 / Test    / scalaSource).value,
+    libraryDependencies ++= AppDependencies.cookieBannerPlay26
+  ).dependsOn(cookieBannerCommon % "test->test")
