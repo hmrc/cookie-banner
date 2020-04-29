@@ -66,5 +66,5 @@ lazy val cookieBannerPlay27 = Project("cookie-banner-play-27", file("cookie-bann
     commonSettings,
     Compile / scalaSource := (cookieBannerPlay26 / Compile / scalaSource).value,
     Test    / scalaSource := (cookieBannerPlay26 / Test    / scalaSource).value,
-    libraryDependencies ++= AppDependencies.cookieBannerPlay26
+    libraryDependencies ++= AppDependencies.cookieBannerPlay27
   ).dependsOn(cookieBannerCommon % "test->test")
