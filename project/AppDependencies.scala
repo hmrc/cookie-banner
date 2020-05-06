@@ -13,19 +13,19 @@ object AppDependencies {
 
   // https://github.com/playframework/scalatestplus-play#releases
   lazy val cookieBannerPlay25: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc" %% "play-partials" % "6.10.0-play-25",
+    "uk.gov.hmrc" %% "play-partials" % "6.11.0-play-25",
   ) ++ testCommon ++ Seq(
     "org.scalatestplus.play" %% "scalatestplus-play" % "2.0.1" % Test,
   )
 
   lazy val cookieBannerPlay26: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc" %% "play-partials" % "6.10.0-play-26"
+    "uk.gov.hmrc" %% "play-partials" % "6.11.0-play-26"
   ) ++ testCommon ++ Seq(
     "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.3" % Test,
   )
 
   lazy val cookieBannerPlay27: Seq[ModuleID] = Seq(
-    "uk.gov.hmrc" %% "play-partials" % "6.10.0-play-27"
+    "uk.gov.hmrc" %% "play-partials" % "6.11.0-play-27"
   ) ++ testCommon ++ Seq(
     "org.scalatestplus.play" %% "scalatestplus-play" % "4.0.3" % Test,
   )
