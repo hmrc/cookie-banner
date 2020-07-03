@@ -1,7 +1,8 @@
-
 # cookie-banner
 
-This is a placeholder README.md for a new repository
+## DEPRECATED
+
+This library is deprecated. Please refer to the [tracking-consent-frontend](http://www.github.com/hmrc/tracking-consent-frontend) project.
 
 ### License
 
